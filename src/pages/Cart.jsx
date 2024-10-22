@@ -4,15 +4,18 @@ import { Link } from "react-router-dom";
 function Cart() {
   const [products, setProducts] = useState([]);
   const [subtotal, setSubtotal] = useState(0);
-  const shippingCost = 5.00;
-  const taxRate = 0.10;
+  const shippingCost = 5.0;
+  const taxRate = 0.1;
   useEffect(() => {
     const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
     setProducts(cartItems);
   }, []);
 
   useEffect(() => {
-    const newSubtotal = products.reduce((sum, product) => sum + product.price * product.count, 0);
+    const newSubtotal = products.reduce(
+      (sum, product) => sum + product.price * product.count,
+      0
+    );
     setSubtotal(newSubtotal);
   }, [products]);
 
@@ -38,30 +41,52 @@ function Cart() {
       <div className="flex flex-col md:flex-row gap-8">
         <div className="md:w-2/3">
           {products.map((product, index) => (
-            <div className="flex items-center space-x-4 my-8 p-4 border rounded-lg" key={index}>
-              <img className="w-32 h-32 rounded-lg object-cover" src={product.image} alt={product.title} />
-              
+            <div
+              className="flex items-center space-x-4 my-8 p-4 border rounded-lg"
+              key={index}
+            >
+              <img
+                className="w-32 h-32 rounded-lg object-cover"
+                src={product.image}
+                alt={product.title}
+              />
+
               <div className="flex-grow">
-                <h2 className="text-xl font-medium capitalize">{product.title}</h2>
-                <p className="text-sm text-gray-600 capitalize">{product.company}</p>
+                <h2 className="text-xl font-medium capitalize">
+                  {product.title}
+                </h2>
+                <p className="text-sm text-gray-600 capitalize">
+                  {product.company}
+                </p>
                 <p className="mt-2">
-                  Color: <span style={{backgroundColor:`${product.color}`}} className="inline-block w-4 h-4 rounded-full ml-2"></span>
+                  Color:{" "}
+                  <span
+                    style={{ backgroundColor: `${product.color}` }}
+                    className="inline-block w-4 h-4 rounded-full ml-2"
+                  ></span>
                 </p>
               </div>
 
               <div className="flex flex-col items-center">
-                <label htmlFor={`amount-${index}`} className="block text-sm font-medium text-gray-700">Amount</label>
-                <select 
+                <label
+                  htmlFor={`amount-${index}`}
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Amount
+                </label>
+                <select
                   id={`amount-${index}`}
                   className="mt-1 block w-20 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                  value={product.count}
+                  value={product.count} 
                   onChange={(e) => handleAmountChange(index, e.target.value)}
                 >
                   {[...Array(20)].map((_, i) => (
-                    <option key={i + 1} value={i + 1}>{i + 1}</option>
+                    <option key={i + 1} value={i + 1}>
+                      {i + 1}
+                    </option>
                   ))}
                 </select>
-                <button 
+                <button
                   onClick={() => handleRemove(index)}
                   className="mt-2 text-sm text-red-600 hover:text-red-800"
                 >
@@ -70,12 +95,13 @@ function Cart() {
               </div>
 
               <div className="text-right">
-                <p className="text-lg font-medium">${(product.price * product.count).toFixed(2)}</p>
+                <p className="text-lg font-medium">
+                  ${(product.price * product.count).toFixed(2)}
+                </p>
               </div>
             </div>
           ))}
         </div>
-
 
         <div className="md:w-1/3">
           <div className="bg-gray-100 p-6 rounded-lg">
@@ -96,7 +122,7 @@ function Cart() {
               <span>Order Total</span>
               <span>${total.toFixed(2)}</span>
             </div>
-            <Link 
+            <Link
               to="/checkout"
               className="block w-full text-center bg-blue-600 text-white py-2 px-4 rounded-md mt-6 hover:bg-blue-700 transition duration-300"
             >

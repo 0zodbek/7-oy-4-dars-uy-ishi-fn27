@@ -12,6 +12,8 @@ import Checkout from "./pages/Checkout";
 import ErrorPage from "./pages/ErrorPage";
 import MainLayout from "./Layouts/MainLayout";
 import Details from "./pages/Details.jsx"
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 // import { CartProvider } from "./components/CartContext.jsx";
 export const TokenContext = createContext();
 export const UserContext = createContext();
@@ -29,6 +31,7 @@ function App() {
   return (
     <>
       <UserContext.Provider value={{ user, setUser }}>
+      <ToastContainer />
         <TokenContext.Provider value={{ token, settoken }}>
          <Routes>
             <Route
