@@ -1,61 +1,85 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Filter from "../components/Filter/Filtr.jsx";
-import styles from "../components/Filter/filtr.module.css";
+import https from "../../axios";
+
 function Products() {
-  const [data, setData] = useState("");
+  const [data, setData] = useState([]);
   const [page, setPage] = useState(null);
-  const navigate = useNavigate("");
+  const navigate = useNavigate();
   const [price, setPrice] = useState(0);
+  const [searchTerm, setSearchTerm] = useState(""); 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const itemsPerPage = 10;
   function handlePriceChange(event) {
     setPrice(event.target.value);
   }
+
+  function handleSearchChange(event) {
+    setSearchTerm(event.target.value);
+  }
+
   useEffect(() => {
-    fetch("https://strapi-store-server.onrender.com/api/products")
-      .then((res) => res.json())
-      .then((data) => setData(data.data))
-      .catch((err) => {
-        console.log(err);
+    https.get("/products")
+      .then((response) => {
+        setData(response.data.data);
+        setTotalPages(Math.ceil(response.data.data.length / itemsPerPage));
+      })
+      .catch((error) => {
+        console.log(error);
       });
   }, []);
+
   const handleClick = (id) => {
-    fetch(`https://strapi-store-server.onrender.com/api/products/${id}`)
-      .then((res) => res.json())
-      .then((productData) => {
-        console.log(productData);
+    https.get(`/products/${id}`)
+      .then((response) => {
+        console.log(response.data);
         navigate(`/product/${id}`);
+      })
+      .catch((error) => {
+        console.log(error);
       });
   };
-  // console.log(data);
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const paginatedData = data.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+
+  console.log(data);
+
   return (
     <div>
-      {/* <Filter /> */}
       <form
-        style={{ maxWidth: "1088px" }}
+        style={{ maxWidth: "1087px" }}
         method="get"
         action="/products?page=2"
         className="bg-base-200 rounded-md px-8 mt-20 mx-auto py-4 grid gap-x-4 gap-y-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 items-center"
       >
         <div className="form-control">
-          <label for="search" className="label">
+          <label htmlFor="search" className="label">
             <span className="label-text capitalize">search product</span>
           </label>
           <input
             type="search"
             name="search"
-            className=" rounded-lg input input-bordered input-sm"
-            value=""
+            className="rounded-lg input input-bordered input-sm"
+            value={searchTerm} 
+            onChange={handleSearchChange}
           />
         </div>
         <div className="form-control">
-          <label for="category" className="label">
+          <label htmlFor="category" className="label">
             <span className="label-text capitalize">select category</span>
           </label>
           <select
             name="category"
             id="category"
-            className=" rounded-lg select select-bordered select-sm"
+            className="rounded-lg select select-bordered select-sm"
           >
             <option value="all">all</option>
             <option value="Tables">Tables</option>
@@ -66,7 +90,7 @@ function Products() {
           </select>
         </div>
         <div className="form-control">
-          <label for="company" className="label">
+          <label htmlFor="company" className="label">
             <span className="label-text capitalize">select company</span>
           </label>
           <select
@@ -83,7 +107,7 @@ function Products() {
           </select>
         </div>
         <div className="form-control">
-          <label for="order" className="label">
+          <label htmlFor="order" className="label">
             <span className="label-text capitalize">sort by</span>
           </label>
           <select
@@ -98,8 +122,9 @@ function Products() {
           </select>
         </div>
         <div className="form-control">
-          <label for="price" className="label cursor-pointer">
-            <span className="label-text capitalize">select price</span>
+          <label htmlFor="price" className="label cursor-pointer">
+
+          <span className="label-text capitalize">select price</span>
             <span>$1,000.00</span>
           </label>
           <input
@@ -107,7 +132,7 @@ function Products() {
             min="0"
             max="1000"
             value={price}
-            className={styles.slider}
+            className="slider" 
             onChange={handlePriceChange}
           />
           <div className="w-full flex justify-between text-xs px-2 mt-2">
@@ -116,14 +141,14 @@ function Products() {
           </div>
         </div>
         <div className="form-control items-center">
-          <label for="shipping" className="label cursor-pointer">
+          <label htmlFor="shipping" className="label cursor-pointer">
             <span className="label-text capitalize">free shipping</span>
           </label>
           <input
             type="checkbox"
             name="shipping"
-            className="checkbox  rounded-lg checkbox-primary checkbox-sm "
-            style={{border: "1px solid grey"}}
+            className="checkbox rounded-lg checkbox-primary checkbox-sm"
+            style={{ border: "1px solid grey" }}
           />
         </div>
         <button type="submit" className="btn rounded-lg btn-primary btn-sm">
@@ -133,17 +158,17 @@ function Products() {
           reset
         </a>
       </form>
-      <div class="flex justify-between items-center mt-8 border-b border-base-300 pb-5 max-w-6xl mx-auto px-8">
-        <h4 class="font-medium text-md">22 products</h4>
-        <div class="flex gap-x-2">
+      <div className="flex justify-between items-center mt-8 border-b border-base-300 pb-5 max-w-6xl mx-auto px-8">
+        <h4 className="font-medium text-md">22 products</h4>
+        <div className="flex gap-x-2">
           <button
             type="button"
-            class="text-xl btn btn-circle btn-sm btn-primary text-primary-content"
+            className="text-xl btn btn-circle btn-sm btn-primary text-primary-content"
           >
             <svg
               stroke="currentColor"
               fill="currentColor"
-              stroke-width="0"
+              strokeWidth="0"
               viewBox="0 0 16 16"
               height="1em"
               width="1em"
@@ -154,19 +179,19 @@ function Products() {
           </button>
           <button
             type="button"
-            class="text-xl btn btn-circle btn-sm btn-ghost text-based-content"
+            className="text-xl btn btn-circle btn-sm btn-ghost text-based-content"
           >
             <svg
               stroke="currentColor"
               fill="currentColor"
-              stroke-width="0"
+              strokeWidth="0"
               viewBox="0 0 16 16"
               height="1em"
               width="1em"
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                fill-rule="evenodd"
+                fillRule="evenodd"
                 d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"
               ></path>
             </svg>
@@ -176,7 +201,7 @@ function Products() {
       <div className="container max-w-6xl mx-auto flex flex-wrap justify-between px-8">
         {data.length > 0 &&
           data.map((el, index) => {
-            // console.log(el);
+            console.log(el);
             return (
               <div
                 onClick={() => handleClick(el.id)}
@@ -186,10 +211,10 @@ function Products() {
                   cursor: "pointer",
                   marginTop: "16px",
                 }}
-                className="card w-full shadow-xl hover:shadow-2xl transition duration-300"
+                className="card w-full shadow-xl mx-auto hover:shadow-2xl transition duration-300"
                 key={index}
               >
-                <figure class="px-4 pt-4">
+                <figure className="px-4 pt-4">
                   <img
                     src={el.attributes.image}
                     alt="avant-garde lamp"
@@ -198,9 +223,10 @@ function Products() {
                 </figure>
                 <div className="card-body items-center text-center">
                   <h2 className="card-title capitalize tracking-wider">
-                    {el.attributes.title}
+
+                  {el.attributes.title}
                   </h2>
-                  <span class="text-secondary">
+                  <span className="text-secondary">
                     ${el.attributes.price / 100}
                   </span>
                 </div>
@@ -208,8 +234,34 @@ function Products() {
             );
           })}
       </div>
-      {/* Pagination */}
-      {/* {page && <Pagination page={page} />} */}
+       {/* Pagination */}
+       <div className="flex justify-center mt-8 mb-8">
+        <div className="btn-group">
+          <button 
+            className="btn btn-sm"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            PREV
+          </button>
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i}
+              className={`btn btn-sm ${currentPage === i + 1 ? 'btn-active' : ''}`}
+              onClick={() => handlePageChange(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button 
+            className="btn btn-sm cursor-pointer"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            NEXT
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

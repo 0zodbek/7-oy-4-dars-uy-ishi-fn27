@@ -1,6 +1,13 @@
-import React from "react";
+import React, {useRef} from "react";
+import https from "../../axios";
 
 function Register() {
+  const nameRef = useRef()
+    const emailRef = useRef()
+    const passwordRef = useRef()
+    https.post('auth/local/register',{
+      username
+    })
   return (
     <div>
       <form

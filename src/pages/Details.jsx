@@ -1,121 +1,143 @@
-import { useEffect, useState, useContext, useRef } from "react";
-import { useParams } from "react-router-dom";
-// import { CartContext } from "../components/CartContext";
+import React, { useState, useEffect } from "react";
+import { useParams, useLocation, Link } from "react-router-dom";
+import https from "../../axios";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Details() {
-  const { id } = useParams();
   const [product, setProduct] = useState(null);
-  const [count, setCount] = useState(null);
-  const counter = useRef();
+  const [selectedColor, setSelectedColor] = useState('');
+  const [amount, setAmount] = useState(1);
+  const { id } = useParams();
+  const location = useLocation();
+
   useEffect(() => {
-    fetch(`https://strapi-store-server.onrender.com/api/products/${id}`)
-      .then((res) => res.json())
-      .then((data) => setProduct(data.data))
-      .catch((error) => console.error("Error fetching product:", error));
+    https.get(`/products/${id}`)
+      .then((response) => {
+        setProduct(response.data.data);
+        if (response.data.data.attributes.colors && response.data.data.attributes.colors.length > 0) {
+          setSelectedColor(response.data.data.attributes.colors[0]);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }, [id]);
 
-  if (!product) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <span className="loading loading-ring loading-lg"></span>
-      </div>
-    );
-  }
+  const handleColorChange = (color) => {
+    setSelectedColor(color);
+  };
 
-  
-  const handleAddToCart = () => {
-    localStorage.setItem("counter",counter)
-    addToCart({
+  const handleAmountChange = (e) => {
+    setAmount(parseInt(e.target.value));
+  };
+
+  const addToCart = () => {
+    if (!product) return;
+
+    const cartItem = {
       id: product.id,
       title: product.attributes.title,
       price: product.attributes.price,
       image: product.attributes.image,
-      company: product.attributes.company,
-      colors: product.attributes.colors,
-      count: count,
+      amount: amount,
+      color: selectedColor,
+      company: product.attributes.company
+    };
+
+    const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    const existingItemIndex = existingCart.findIndex(
+      item => item.id === cartItem.id && item.color === cartItem.color
+    );
+
+    if (existingItemIndex !== -1) {
+      existingCart[existingItemIndex].amount += cartItem.amount;
+    } else {
+      existingCart.push(cartItem);
+    }
+
+    localStorage.setItem("cart", JSON.stringify(existingCart));
+
+    toast.success('Product added to cart successfully!', {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
     });
   };
 
+  if (!product) {
+    return <div className="flex justify-center items-center h-screen">
+    <span className="loading loading-dots loading-lg"></span>
+  </div>;
+  }
+
+
   return (
-    <div className="container px-8 py-20 mx-auto max-w-6xl lg:px-8 flex justify-between">
-          <div className="flex gap-20">
-            {""}
-            <div className="w-[512px] h-[384px]">
-              <img
-                className="h-96 object-cover rounded-lg lg:w-full"
-                src={product.attributes?.image}
-                alt={product.attributes?.title}
-              />
-            </div>
-            <div className="w-1/2">
-              <h2 className="capitalize text-[#394E6A] text-3xl font-bold">
-                {product.attributes.title}
-              </h2>
-              <p className="text-xl text-neutral-content font-bold mt-2">
-                {product.attributes.company}
-              </p>
-              <p className="mt-3 text-xl">${product.attributes.price / 100}</p>
-              <p className="mt-6 leading-8 text-base">
-                {product.attributes.description}
-              </p>
-              <h4 className="text-md font-medium tracking-wider capitalize mt-6">
-                colors
-              </h4>
-              <div className="colors">
-                <button
-                  type="button"
-                  className="badge w-6 h-6 mr-2 false bg-green-500"
-                ></button>
-                <button
-                  type="button"
-                  className="badge w-6 h-6 mr-2 false bg-blue-500 border-secondary"
-                ></button>
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="text-sm breadcrumbs mb-4">
+        <ul>
+          <li><Link to="/">Home</Link></li>
+          <li><Link to="/products">Products</Link></li>
+          <li>{product.attributes.title}</li>
+        </ul>
+      </div>
+      <div className="grid md:grid-cols-2 gap-8">
+        <img
+          src={product.attributes.image}
+          alt={product.attributes.title}
+          className="w-full h-96 object-cover rounded-lg"
+        />
+        <div>
+          <h1 className="text-3xl font-bold mb-2">{product.attributes.title}</h1>
+          <p className="text-xl text-gray-500 mb-2">{product.attributes.company}</p>
+          <p className="text-2xl font-bold text-primary mb-4">${product.attributes.price / 100}</p>
+          <p className="mb-4">{product.attributes.description}</p>
+          
+          {product.attributes.colors && (
+            <div className="mb-4">
+              <h4 className="font-medium mb-2">Colors</h4>
+              <div className="flex space-x-2">
+                {product.attributes.colors.map((color) => (
+                  <button
+                    key={color}
+                    className={`w-6 h-6 rounded-full ${selectedColor === color ? 'ring-2 ring-offset-2 ring-gray-400' : ''}`}
+                    style={{ backgroundColor: color }}
+                    onClick={() => handleColorChange(color)}
+                  />
+                ))}
               </div>
-              <label className="label" htmlFor="amount">
-                <h4 className="text-md font-medium -tracking-wider capitalize">
-                  amount
-                </h4>
-              </label>
-              <select
-              ref={counter}
-                onChange={() => {
-                  setCount(event.target.value);
-                }}
-                className="select border-primary border-solid select-bordered w-80 rounded-md select-md"
-                id="amount"
-              >
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
-                <option value="11">11</option>
-                <option value="12">12</option>
-                <option value="13">13</option>
-                <option value="14">14</option>
-                <option value="15">15</option>
-                <option value="16">16</option>
-                <option value="17">17</option>
-                <option value="18">18</option>
-                <option value="19">19</option>
-                <option value="20">20</option>
-              </select>
-              <br />
-              <button
-                onClick={handleAddToCart}
-                className="btn hover:bg-blue-900 btn-md mt-12 border-none rounded-lg bg-blue-700 text-white"
-              >
-                Add to bag
-              </button>
-              {""}
             </div>
+          )}
+          
+          <div className="form-control w-full max-w-xs mb-4">
+            <label className="label" htmlFor="amount">
+              <span className="label-text">Amount</span>
+            </label>
+            <select 
+              className="select select-bordered"
+              id="amount"
+              value={amount}
+              onChange={handleAmountChange}
+            >
+              {[...Array(10)].map((_, i) => (
+                <option key={i + 1} value={i + 1}>{i + 1}</option>
+              ))}
+            </select>
           </div>
+          
+          <button
+            className="btn btn-primary"
+            onClick={addToCart}
+          >
+            ADD TO BAG
+          </button>
         </div>
+      </div>
+    </div>
   );
 }
 

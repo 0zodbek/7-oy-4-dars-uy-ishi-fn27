@@ -20,19 +20,12 @@ export const UserContext = createContext();
 function App() {
   const [token, settoken] = useState(localStorage.getItem("token"));
   const [user, setUser] = useState({});
-
-  useEffect(() => {
-    if (localStorage.getItem("user")) {
-      setUser(JSON.parse(localStorage.getItem("user")));
-      }
-  }, []);
-    let User = {
-    name: "John Doe",
-    email: "john@example.com",
-    password: "password",
-  };
-  localStorage.setItem("user", JSON.stringify(User));
-  
+   
+  // useEffect(() => {
+    // if (localStorage.getItem("user")) {
+      // setUser(JSON.parse(localStorage.getItem("user")));
+      // }
+  // }, []);
   return (
     <>
       <UserContext.Provider value={{ user, setUser }}>
