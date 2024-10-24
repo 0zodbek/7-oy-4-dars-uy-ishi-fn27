@@ -19,7 +19,7 @@ function Home() {
         navigate(`/product/${id}`);
       });
   };
-  console.log(data);
+  // console.log(data);
   return (
     <div>
       <div className="container px-8 py-20 mx-auto max-w-6xl flex justify-between">

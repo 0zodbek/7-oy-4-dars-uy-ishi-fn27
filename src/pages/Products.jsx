@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import https from "../../axios";
-
+import ResponsivePagination from 'react-responsive-pagination';
+import 'react-responsive-pagination/themes/classic.css';
 function Products() {
   const [data, setData] = useState([]);
   const [page, setPage] = useState(null);
@@ -9,7 +10,7 @@ function Products() {
   const [price, setPrice] = useState(0);
   const [searchTerm, setSearchTerm] = useState(""); 
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
+  const [totalPages, setTotalPages] = useState(3);
   const itemsPerPage = 10;
   function handlePriceChange(event) {
     setPrice(event.target.value);
@@ -23,7 +24,7 @@ function Products() {
     https.get("/products")
       .then((response) => {
         setData(response.data.data);
-        setTotalPages(Math.ceil(response.data.data.length / itemsPerPage));
+        // setTotalPages(Math.ceil(response.data.data.length / 10));
       })
       .catch((error) => {
         console.log(error);
@@ -44,10 +45,16 @@ function Products() {
     setCurrentPage(page);
   };
 
-  const paginatedData = data.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  useEffect(()=>{
+    https.get(`/products?page=${currentPage}`)
+    .then((response) => {
+      setData(response.data.data);
+      console.log(response.data);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  },[currentPage])
 
 
   console.log(data);
@@ -127,13 +134,22 @@ function Products() {
           <span className="label-text capitalize">select price</span>
             <span>$1,000.00</span>
           </label>
-          <input
+          {/* <input
             type="range"
             min="0"
             max="1000"
             value={price}
             className="slider" 
             onChange={handlePriceChange}
+          /> */}
+          <input
+            type="range"
+            name="price"
+            min="0"
+            max="10000"
+            value={price}
+            onChange={handlePriceChange}
+            className="slider"
           />
           <div className="w-full flex justify-between text-xs px-2 mt-2">
             <span className="font-bold text-md">0</span>
@@ -198,10 +214,10 @@ function Products() {
           </button>
         </div>
       </div>
-      <div className="container max-w-6xl mx-auto flex flex-wrap justify-between px-8">
+      <div className="container max-w-6xl mx-auto mb-10 flex flex-wrap justify-between px-8">
         {data.length > 0 &&
           data.map((el, index) => {
-            console.log(el);
+            // console.log(el);
             return (
               <div
                 onClick={() => handleClick(el.id)}
@@ -235,33 +251,12 @@ function Products() {
           })}
       </div>
        {/* Pagination */}
-       <div className="flex justify-center mt-8 mb-8">
-        <div className="btn-group">
-          <button 
-            className="btn btn-sm"
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            PREV
-          </button>
-          {[...Array(totalPages)].map((_, i) => (
-            <button
-              key={i}
-              className={`btn btn-sm ${currentPage === i + 1 ? 'btn-active' : ''}`}
-              onClick={() => handlePageChange(i + 1)}
-            >
-              {i + 1}
-            </button>
-          ))}
-          <button 
-            className="btn btn-sm cursor-pointer"
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            NEXT
-          </button>
-        </div>
-      </div>
+       <ResponsivePagination
+      //  className=""
+      current={currentPage}
+      total={totalPages}
+      onPageChange={setCurrentPage}
+    />
     </div>
   );
 }

@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, createContext } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
 import https from "../../axios";
+import { CountContext } from "../App";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+export const countContext = createContext
 function Details() {
   const [product, setProduct] = useState(null);
   const [selectedColor, setSelectedColor] = useState('');
   const [amount, setAmount] = useState(1);
   const { id } = useParams();
   const location = useLocation();
-
+  const {count, setCount} = useContext(CountContext)
   useEffect(() => {
     https.get(`/products/${id}`)
       .then((response) => {
@@ -30,6 +31,7 @@ function Details() {
 
   const handleAmountChange = (e) => {
     setAmount(parseInt(e.target.value));
+
   };
 
   const addToCart = () => {
@@ -44,7 +46,7 @@ function Details() {
       color: selectedColor,
       company: product.attributes.company
     };
-
+    setCount(count => count + amount)
     const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
 
     const existingItemIndex = existingCart.findIndex(
@@ -71,7 +73,7 @@ function Details() {
 
   if (!product) {
     return <div className="flex justify-center items-center h-screen">
-    <span className="loading loading-dots loading-lg"></span>
+    <span className="loading "></span>
   </div>;
   }
 

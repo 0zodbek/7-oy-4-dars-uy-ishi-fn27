@@ -1,5 +1,4 @@
 import { useState, useEffect, createContext } from "react";
-import "./App.css";
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import Products from "./pages/Products.jsx";
@@ -12,27 +11,24 @@ import Checkout from "./pages/Checkout";
 import ErrorPage from "./pages/ErrorPage";
 import MainLayout from "./Layouts/MainLayout";
 import Details from "./pages/Details.jsx"
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-// import { CartProvider } from "./components/CartContext.jsx";
+
 export const TokenContext = createContext();
 export const UserContext = createContext();
+export const CountContext = createContext();
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [token, settoken] = useState(localStorage.getItem("token"));
   const [user, setUser] = useState({});
-   
-  // useEffect(() => {
-    // if (localStorage.getItem("user")) {
-      // setUser(JSON.parse(localStorage.getItem("user")));
-      // }
-  // }, []);
+  const [count, setCount] = useState({})
   return (
     <>
+    <CountContext.Provider value={{count, setCount}}>
       <UserContext.Provider value={{ user, setUser }}>
-      <ToastContainer />
         <TokenContext.Provider value={{ token, settoken }}>
+          <ToastContainer />
          <Routes>
             <Route
               path="/"
@@ -100,6 +96,8 @@ function App() {
           </Routes>
         </TokenContext.Provider>
       </UserContext.Provider>
+    </CountContext.Provider>
+      
     </>
   );
 }

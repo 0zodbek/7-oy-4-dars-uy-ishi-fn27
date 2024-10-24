@@ -2094,6 +2094,13 @@ react-is@^16.13.1:
   resolved "https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
+react-responsive-pagination@^2.9.0:
+  version "2.9.0"
+  resolved "https://registry.yarnpkg.com/react-responsive-pagination/-/react-responsive-pagination-2.9.0.tgz#bb9f07273263b25ab7095e5a72333543ec0c1e39"
+  integrity sha512-eVOnzZZuwVreVR05QxVmN3MiP47xa+dkfjf3lJ0QivrtEyS1n4mrxk5d22Aczin9fB4OGHPgopsZN9pRmCaIFw==
+  dependencies:
+    prop-types "^15.8.1"
+
 react-router-dom@^6.27.0:
   version "6.27.0"
   resolved "https://registry.npmjs.org/react-router-dom/-/react-router-dom-6.27.0.tgz"
