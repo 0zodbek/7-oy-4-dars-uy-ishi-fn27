@@ -38,7 +38,7 @@ function Header() {
     <div className="bg-base-200">
       <div className="header-auth bg-neutral text-white ">
         <div className="flex justify-end max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-1.5">
-          {token && (
+          {token.length < 2 && (
             <div className="flex gap-x-2 items-center">
               <h1 className="text-right text-xs text-blue-50 sm:text-sm">
                 Hello, {user.user.username}
